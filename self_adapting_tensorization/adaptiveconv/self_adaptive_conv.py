@@ -44,6 +44,8 @@ class SelfAdaptiveConv(FactorizedConv):
                          has_bias=has_bias, n_layers=n_layers, factorization='cp',
                          rank=rank, implementation='factorized', fixed_rank_modes=fixed_rank_modes)
 
+        self.weight().normal_()
+
     def forward(self, x, adaptive_weights, indices=0):
         """Performs a forward pass of the adaptive factorized convolution
         

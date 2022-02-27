@@ -9,6 +9,7 @@ from utils.misc import *
 from utils.test_helpers import *
 from utils.prepare_dataset import *
 from utils.rotation import rotate_batch
+from utils.save_model import save_ckp, load_ckp
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='cifar10')
@@ -30,28 +31,40 @@ parser.add_argument('--rotation_type', default='rand')
 parser.add_argument('--outf', default='.')
 
 args = parser.parse_args()
+
 import os
+
 if os.path.isdir('datasets/'):
     args.dataroot = 'datasets/'
 
 my_makedir(args.outf)
 import torch.backends.cudnn as cudnn
+
 cudnn.benchmark = True
 net, ext, head, ssh = build_model_modules(args)
 _, teloader = prepare_test_data(args)
 _, trloader = prepare_train_data(args)
 
-parameters = list(net.parameters())+list(head.parameters())
+parameters = list(net.parameters()) + list(head.parameters())
 optimizer = optim.SGD(parameters, lr=args.lr, momentum=0.9, weight_decay=5e-4)
+
+# load from checkpoint to resume training
+checkpoint_dir = args.outf + '/checkpoint.pt'
+# net, ssh, optimizer, start_epoch = load_ckp(checkpoint_dir, net, ssh, optimizer)
+
 scheduler = torch.optim.lr_scheduler.MultiStepLR(
     optimizer, [args.milestone_1, args.milestone_2], gamma=0.1, last_epoch=-1)
 criterion = nn.CrossEntropyLoss().cuda()
+
+print("Model's state_dict:")
+for param_tensor in net.state_dict():
+    print(param_tensor, "\t", net.state_dict()[param_tensor].size())
 
 all_err_cls = []
 all_err_ssh = []
 print('Running...')
 print('Error (%)\t\ttest\t\tself-supervised')
-for epoch in range(1, args.nepoch+1):
+for epoch in range(1, args.nepoch + 1):
     net.train()
     ssh.train()
 
@@ -77,12 +90,21 @@ for epoch in range(1, args.nepoch+1):
     all_err_ssh.append(err_ssh)
     scheduler.step()
 
-    print(('Epoch %d/%d:' %(epoch, args.nepoch)).ljust(24) +
-                    '%.2f\t\t%.2f' %(err_cls*100, err_ssh*100))
+    print(('Epoch %d/%d:' % (epoch, args.nepoch)).ljust(24) +
+          '%.2f\t\t%.2f' % (err_cls * 100, err_ssh * 100))
     torch.save((all_err_cls, all_err_ssh), args.outf + '/loss.pth')
     plot_epochs(all_err_cls, all_err_ssh, args.outf + '/loss.pdf')
 
+    if epoch % 10 == 0:
+        checkpoint = {
+            'epoch': epoch + 1,
+            'state_dict_net': net.state_dict(),
+            'state_dict_ssh': ssh.state_dict(),
+            'optimizer': optimizer.state_dict()
+        }
+        save_ckp(checkpoint, checkpoint_dir)
+
 state = {'err_cls': err_cls, 'err_ssh': err_ssh,
-            'net': net.state_dict(), 'head': head.state_dict(),
-            'optimizer': optimizer.state_dict()}
+         'net': net.state_dict(), 'head': head.state_dict(),
+         'optimizer': optimizer.state_dict()}
 torch.save(state, args.outf + '/ckpt.pth')
