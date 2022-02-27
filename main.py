@@ -56,9 +56,13 @@ scheduler = torch.optim.lr_scheduler.MultiStepLR(
     optimizer, [args.milestone_1, args.milestone_2], gamma=0.1, last_epoch=-1)
 criterion = nn.CrossEntropyLoss().cuda()
 
-print("Model's state_dict:")
+print("net's state_dict:")
 for param_tensor in net.state_dict():
     print(param_tensor, "\t", net.state_dict()[param_tensor].size())
+
+print("ssh's state_dict:")
+for param_tensor in ssh.state_dict():
+    print(param_tensor, "\t", ssh.state_dict()[param_tensor].size())
 
 all_err_cls = []
 all_err_ssh = []
@@ -95,7 +99,7 @@ for epoch in range(1, args.nepoch + 1):
     torch.save((all_err_cls, all_err_ssh), args.outf + '/loss.pth')
     plot_epochs(all_err_cls, all_err_ssh, args.outf + '/loss.pdf')
 
-    if epoch % 10 == 0:
+    if epoch % 5 == 0:
         checkpoint = {
             'epoch': epoch + 1,
             'state_dict_net': net.state_dict(),

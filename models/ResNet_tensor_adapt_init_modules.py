@@ -24,6 +24,7 @@ class AdaptConv(nn.Module):
         self.conv1 = SelfAdaptiveConv(in_channels, out_channels, kernel_size=kernel_size, order=order, stride=stride,
                                       padding=padding, bias=bias)
         self.adaptive_weights_preconv = nn.Parameter(torch.ones(1, self.conv1.rank))
+        self.adaptive_weights_preconv.data.normal_()
 
     def forward(self, x, adapt=False):
         if not adapt:
@@ -44,11 +45,13 @@ class BasicBlock(nn.Module):
         self.relu1 = nn.ReLU(inplace=True)
         self.conv1 = SelfAdaptiveConv.from_conv(conv3x3(inplanes, planes, stride))
         self.adaptive_weights_conv1 = nn.Parameter(torch.ones(1, self.conv1.rank))
+        self.adaptive_weights_conv1.data.normal_()
 
         self.bn2 = norm_layer(planes)
         self.relu2 = nn.ReLU(inplace=True)
         self.conv2 = SelfAdaptiveConv(planes, planes, kernel_size=3, order=2, stride=1, padding=1, bias=False)
         self.adaptive_weights_conv2 = nn.Parameter(torch.ones(1, self.conv2.rank))
+        self.adaptive_weights_conv2.data.normal_()
 
     def forward(self, x, adapt=False):
         batch_size = x.shape[0]
