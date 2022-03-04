@@ -49,7 +49,7 @@ parameters = list(net.parameters()) + list(head.parameters())
 optimizer = optim.SGD(parameters, lr=args.lr, momentum=0.9, weight_decay=5e-4)
 
 # load from checkpoint to resume training
-checkpoint_dir = args.outf + '/checkpoint.pt'
+# checkpoint_dir = args.outf + '/checkpoint.pt'
 # net, ssh, optimizer, start_epoch = load_ckp(checkpoint_dir, net, ssh, optimizer)
 
 scheduler = torch.optim.lr_scheduler.MultiStepLR(
@@ -66,8 +66,10 @@ for param_tensor in ssh.state_dict():
 
 all_err_cls = []
 all_err_ssh = []
+all_loss = []
+all_loss_ssh = []
 print('Running...')
-print('Error (%)\t\ttest\t\tself-supervised')
+print('Error (%)\t\ttest\t\tself-supervised\t\tloss_last_batch\t\tloss_ssh_last_batch')
 for epoch in range(1, args.nepoch + 1):
     net.train()
     ssh.train()
@@ -83,7 +85,7 @@ for epoch in range(1, args.nepoch + 1):
             inputs_ssh, labels_ssh = inputs_ssh.cuda(), labels_ssh.cuda()
             outputs_ssh = ssh(inputs_ssh)
             loss_ssh = criterion(outputs_ssh, labels_ssh)
-            loss += loss_ssh
+            loss += 2*loss_ssh
 
         loss.backward()
         optimizer.step()
@@ -92,14 +94,19 @@ for epoch in range(1, args.nepoch + 1):
     err_ssh = 0 if args.shared is None else test(teloader, ssh, sslabel='expand')[0]
     all_err_cls.append(err_cls)
     all_err_ssh.append(err_ssh)
+    all_loss.append(loss)
+    all_loss_ssh.append(loss_ssh)
     scheduler.step()
 
     print(('Epoch %d/%d:' % (epoch, args.nepoch)).ljust(24) +
-          '%.2f\t\t%.2f' % (err_cls * 100, err_ssh * 100))
+          '%.2f\t\t%.2f\t\t%.2f\t\t%.2f' % (err_cls * 100, err_ssh * 100, loss, loss_ssh))
     torch.save((all_err_cls, all_err_ssh), args.outf + '/loss.pth')
+    torch.save((all_loss, all_loss_ssh), args.outf + '/train_loss_last_batch.pth')
     plot_epochs(all_err_cls, all_err_ssh, args.outf + '/loss.pdf')
 
     if epoch % 5 == 0:
+        checkpoint_dir = args.outf + '/checkpoint' + str(epoch) + '.pt'
+        print(checkpoint_dir)
         checkpoint = {
             'epoch': epoch + 1,
             'state_dict_net': net.state_dict(),
