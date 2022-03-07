@@ -12,6 +12,7 @@ parser.add_argument('--level', default=0, type=int)
 parser.add_argument('--corruption', default='original')
 parser.add_argument('--dataroot', default='/data/yusun/datasets/')
 parser.add_argument('--shared', default=None)
+parser.add_argument('--tensor', action='store_true')
 ########################################################################
 parser.add_argument('--depth', default=26, type=int)
 parser.add_argument('--width', default=1, type=int)
@@ -33,7 +34,7 @@ teset, teloader = prepare_test_data(args)
 
 print('Resuming from %s...' %(args.resume))
 ckpt = torch.load(args.resume + '/ckpt.pth')
-net.load_state_dict(ckpt['net'])
+net.load_state_dict(ckpt['net'], strict=False)
 cls_initial, cls_correct, cls_losses = test(teloader, net)
 
 print('Old test error cls %.2f' %(ckpt['err_cls']*100))
@@ -45,7 +46,7 @@ if args.none:
 	quit()
 
 print('Old test error ssh %.2f' %(ckpt['err_ssh']*100))
-head.load_state_dict(ckpt['head'])
+head.load_state_dict(ckpt['head'], strict=False)
 ssh_initial, ssh_correct, ssh_losses = [], [], []
 
 labels = [0,1,2,3]
