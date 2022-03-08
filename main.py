@@ -85,7 +85,7 @@ for epoch in range(1, args.nepoch + 1):
             inputs_ssh, labels_ssh = inputs_ssh.cuda(), labels_ssh.cuda()
             outputs_ssh = ssh(inputs_ssh)
             loss_ssh = criterion(outputs_ssh, labels_ssh)
-            loss += 2*loss_ssh
+            loss += loss_ssh
 
         loss.backward()
         optimizer.step()
@@ -109,8 +109,8 @@ for epoch in range(1, args.nepoch + 1):
         print(checkpoint_dir)
         checkpoint = {
             'epoch': epoch + 1,
-            'state_dict_net': net.state_dict(),
-            'state_dict_ssh': ssh.state_dict(),
+            'net': net.state_dict(),
+            'head': head.state_dict(),
             'optimizer': optimizer.state_dict()
         }
         save_ckp(checkpoint, checkpoint_dir)

@@ -111,8 +111,8 @@ for epoch in range(1, args.nepoch + 1):
         print(checkpoint_dir)
         checkpoint = {
             'epoch': epoch + 1,
-            'state_dict_net': net.state_dict(),
-            'state_dict_ssh': ssh.state_dict(),
+            'net': net.state_dict(),
+            'head': head.state_dict(),
             'optimizer': optimizer.state_dict()
         }
         save_ckp(checkpoint, checkpoint_dir)
