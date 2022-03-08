@@ -89,7 +89,8 @@ def adapt_single(image):
 		inputs_ssh, labels_ssh = rotate_batch(inputs, 'rand')
 		inputs_ssh, labels_ssh = inputs_ssh.cuda(), labels_ssh.cuda()
 		optimizer_ssh.zero_grad()
-		outputs_ssh = ssh(inputs_ssh, adapt=True) # use adaptive weights
+		outputs_ssh = ssh(inputs_ssh, adapt=False) # since we have multiple orientations of the same image, we use the
+		# same set of weights and repeat for batch_size times
 		loss_ssh = criterion_ssh(outputs_ssh, labels_ssh)
 		loss_ssh.backward()
 		optimizer_ssh.step()
