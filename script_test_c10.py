@@ -13,11 +13,12 @@ dataroot += 'datasets/'		# PLEASE EDIT THIS
 if level == 0:
 	common_corruptions = ['cifar_new']
 else:
-	common_corruptions = ['gaussian_noise', 'shot_noise', 'impulse_noise', 'defocus_blur', 'glass_blur',
-	                    'motion_blur', 'zoom_blur', 'snow', 'frost', 'fog',
-	                    'brightness', 'contrast', 'elastic_transform', 'pixelate', 'jpeg_compression']
-	if level == 5:
-		common_corruptions.append('original')
+	# common_corruptions = ['gaussian_noise', 'shot_noise', 'impulse_noise', 'defocus_blur', 'glass_blur',
+	#                     'motion_blur', 'zoom_blur', 'snow', 'frost', 'fog',
+	#                     'brightness', 'contrast', 'elastic_transform', 'pixelate', 'jpeg_compression']
+	common_corruptions = ['gaussian_noise']
+	# if level == 5:
+	# 	common_corruptions.append('original')
 
 fix_bn = len(sys.argv) > 5 and sys.argv[5] == 'fix_bn'
 fix_str = '_fix_bn' if fix_bn else ''

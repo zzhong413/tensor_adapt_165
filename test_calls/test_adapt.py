@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='cifar10')
 parser.add_argument('--level', default=0, type=int)
 parser.add_argument('--corruption', default='original')
-parser.add_argument('--dataroot', default='/data/yusun/datasets/')
+parser.add_argument('--dataroot', default='/data/datasets/')
 parser.add_argument('--shared', default=None)
 ########################################################################
 parser.add_argument('--depth', default=26, type=int)
