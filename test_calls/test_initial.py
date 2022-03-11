@@ -29,7 +29,7 @@ args = parser.parse_args()
 my_makedir(args.outf)
 import torch.backends.cudnn as cudnn
 cudnn.benchmark = True
-net, ext, head, ssh = build_model_modules(args)
+net, ext, head, ssh = build_model(args)
 teset, teloader = prepare_test_data(args)
 
 print('Resuming from %s...' %(args.resume))
