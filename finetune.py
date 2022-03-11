@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from utils.misc import *
-from utils.test_helpers import *
+from utils.test_helpers_TTT import *
 from utils.prepare_dataset import *
 from utils.rotation import rotate_batch
 from utils.save_model import save_ckp, load_ckp
@@ -22,7 +22,7 @@ parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--group_norm', default=0, type=int)
 parser.add_argument('--tensor', action='store_true')
 ########################################################################
-parser.add_argument('--lr', default=0.001, type=float)
+parser.add_argument('--lr', default=0.00001, type=float)
 parser.add_argument('--nepoch', default=75, type=int)
 parser.add_argument('--milestone_1', default=50, type=int)
 parser.add_argument('--milestone_2', default=65, type=int)
@@ -46,7 +46,7 @@ _, teloader = prepare_test_data(args)
 _, trloader = prepare_train_data(args)
 
 # load from checkpoint to resume training
-checkpoint_dir = 'results/cifar10_tensor_layer2_gn_expand/ckpt.pth'
+checkpoint_dir = 'results/cifar10_tensor_layer2_gn_expand_TTT/ckpt.pth'
 ckpt = torch.load(checkpoint_dir)
 net.load_state_dict(ckpt['net'], strict=False)
 head.load_state_dict(ckpt['head'], strict=False)

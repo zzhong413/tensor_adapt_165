@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='cifar10')
 parser.add_argument('--level', default=0, type=int)
 parser.add_argument('--corruption', default='original')
-parser.add_argument('--dataroot', default='/data/yusun/datasets/')
+parser.add_argument('--dataroot', default='datasets/')
 parser.add_argument('--shared', default=None)
 parser.add_argument('--tensor', action='store_true')
 ########################################################################
@@ -29,7 +29,7 @@ args = parser.parse_args()
 my_makedir(args.outf)
 import torch.backends.cudnn as cudnn
 cudnn.benchmark = True
-net, ext, head, ssh = build_model(args)
+net, ext, head, ssh = build_model_modules(args)
 teset, teloader = prepare_test_data(args)
 
 print('Resuming from %s...' %(args.resume))

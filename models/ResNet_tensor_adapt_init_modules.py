@@ -33,7 +33,8 @@ class AdaptConv(nn.Module):
             adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.1
             x = self.conv1(x, adaptive_weights)
         else:
-            x = self.conv1(x, self.adaptive_weights_preconv)
+            adaptive_weights = self.adaptive_weights_preconv.repeat(x.shape[0], 1)
+            x = self.conv1(x, adaptive_weights)
         return x
 
 
@@ -66,7 +67,8 @@ class BasicBlock(nn.Module):
             adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.1
             residual = self.conv1(residual, adaptive_weights)
         else:
-            residual = self.conv1(residual, self.adaptive_weights_conv1)
+            adaptive_weights = self.adaptive_weights_conv1.repeat(batch_size, 1)
+            residual = self.conv1(residual, adaptive_weights)
 
         residual = self.bn2(residual)
         residual = self.relu2(residual)
@@ -76,7 +78,8 @@ class BasicBlock(nn.Module):
             adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.1
             residual = self.conv2(residual, adaptive_weights)
         else:
-            residual = self.conv2(residual, self.adaptive_weights_conv2)
+            adaptive_weights = self.adaptive_weights_conv2.repeat(batch_size, 1)
+            residual = self.conv2(residual, adaptive_weights)
 
         if self.downsample is not None:
             x = self.downsample(x)

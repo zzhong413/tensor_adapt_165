@@ -48,10 +48,6 @@ _, trloader = prepare_train_data(args)
 parameters = list(net.parameters()) + list(head.parameters())
 optimizer = optim.SGD(parameters, lr=args.lr, momentum=0.9, weight_decay=5e-4)
 
-# load from checkpoint to resume training
-# checkpoint_dir = args.outf + '/checkpoint.pt'
-# net, ssh, optimizer, start_epoch = load_ckp(checkpoint_dir, net, ssh, optimizer)
-
 scheduler = torch.optim.lr_scheduler.MultiStepLR(
     optimizer, [args.milestone_1, args.milestone_2], gamma=0.1, last_epoch=-1)
 criterion = nn.CrossEntropyLoss().cuda()
