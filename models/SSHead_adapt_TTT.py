@@ -68,7 +68,7 @@ class Head_on_layer2(nn.Module):
 
         assert (depth - 2) % 6 == 0  # depth is 6N+2
         self.N = (depth - 2) // 6
-        self.inplanes = 64
+        self.inplanes = 32
         super(Head_on_layer2, self).__init__()
 
         self.layer3 = self._make_layer(norm_layer, 64 * width, j='0.', stride=2)
