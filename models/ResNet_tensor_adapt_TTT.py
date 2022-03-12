@@ -25,16 +25,17 @@ class AdaptConv(nn.Module):
         conv_layer.weight.data = ttt_layer
         self.conv1 = SelfAdaptiveConv.from_conv(conv_layer, rank=0.9)
         # self.adaptive_weights_preconv = nn.Parameter(torch.ones(1, self.conv1.rank))
-        self.adaptive_weights_preconv = torch.ones(1, self.conv1.rank)
+        # self.adaptive_weights_preconv = torch.ones(1, self.conv1.rank)
 
     def forward(self, x, adapt=False):
+        adaptive_weights_preconv = torch.ones(1, self.conv1.rank)
         if not adapt:
-            l2_norm = torch.linalg.vector_norm(self.adaptive_weights_preconv)
-            adaptive_weights = self.adaptive_weights_preconv.repeat(x.shape[0], 1)
+            l2_norm = torch.linalg.vector_norm(adaptive_weights_preconv)
+            adaptive_weights = adaptive_weights_preconv.repeat(x.shape[0], 1)
             adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
             x = self.conv1(x, adaptive_weights)
         else:
-            adaptive_weights = self.adaptive_weights_preconv.repeat(x.shape[0], 1)
+            adaptive_weights = adaptive_weights_preconv.repeat(x.shape[0], 1)
             x = self.conv1(x, adaptive_weights)
         return x
 
@@ -53,7 +54,7 @@ class BasicBlock(nn.Module):
         conv_layer1.weight.data = ttt_net[j+str(i)+'.conv1.weight']
         self.conv1 = SelfAdaptiveConv.from_conv(conv_layer1, rank=0.9)
         # self.adaptive_weights_conv1 = nn.Parameter(torch.ones(1, self.conv1.rank))
-        self.adaptive_weights_conv1 = torch.ones(1, self.conv1.rank)
+        # self.adaptive_weights_conv1 = torch.ones(1, self.conv1.rank)
 
         self.bn2 = norm_layer(planes)
         self.bn2.weight.data = ttt_net[j+str(i)+'.bn2.weight']
@@ -63,31 +64,33 @@ class BasicBlock(nn.Module):
         conv_layer2.weight.data = ttt_net[j+str(i)+'.conv2.weight']
         self.conv2 = SelfAdaptiveConv.from_conv(conv_layer2, rank=0.9)
         # self.adaptive_weights_conv2 = nn.Parameter(torch.ones(1, self.conv2.rank))
-        self.adaptive_weights_conv2 = torch.ones(1, self.conv2.rank)
+        # self.adaptive_weights_conv2 = torch.ones(1, self.conv2.rank)
 
     def forward(self, x, adapt=False):
         batch_size = x.shape[0]
         residual = x
         residual = self.bn1(residual)
         residual = self.relu1(residual)
+        adaptive_weights_conv1 = torch.ones(1, self.conv1.rank)
         if not adapt:
-            l2_norm = torch.linalg.vector_norm(self.adaptive_weights_conv1)
-            adaptive_weights = self.adaptive_weights_conv1.repeat(batch_size, 1)
+            l2_norm = torch.linalg.vector_norm(adaptive_weights_conv1)
+            adaptive_weights = adaptive_weights_conv1.repeat(batch_size, 1)
             adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
             residual = self.conv1(residual, adaptive_weights)
         else:
-            adaptive_weights = self.adaptive_weights_conv1.repeat(batch_size, 1)
+            adaptive_weights = adaptive_weights_conv1.repeat(batch_size, 1)
             residual = self.conv1(residual, adaptive_weights)
 
         residual = self.bn2(residual)
         residual = self.relu2(residual)
+        adaptive_weights_conv2 = torch.ones(1, self.conv2.rank)
         if not adapt:
-            l2_norm = torch.linalg.vector_norm(self.adaptive_weights_conv2)
-            adaptive_weights = self.adaptive_weights_conv2.repeat(batch_size, 1)
+            l2_norm = torch.linalg.vector_norm(adaptive_weights_conv2)
+            adaptive_weights = adaptive_weights_conv2.repeat(batch_size, 1)
             adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
             residual = self.conv2(residual, adaptive_weights)
         else:
-            adaptive_weights = self.adaptive_weights_conv2.repeat(batch_size, 1)
+            adaptive_weights = adaptive_weights_conv2.repeat(batch_size, 1)
             residual = self.conv2(residual, adaptive_weights)
 
         if self.downsample is not None:
