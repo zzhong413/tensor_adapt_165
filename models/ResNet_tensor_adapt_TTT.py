@@ -29,9 +29,9 @@ class AdaptConv(nn.Module):
 
     def forward(self, x, adapt=False):
         if not adapt:
-            l2_norm = torch.linalg.vector_norm(self.adaptive_weights_preconv)
+            # l2_norm = torch.linalg.vector_norm(self.adaptive_weights_preconv)
             adaptive_weights = self.adaptive_weights_preconv.repeat(x.shape[0], 1)
-            adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
+            # adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
             x = self.conv1(x, adaptive_weights)
         else:
             adaptive_weights = self.adaptive_weights_preconv.repeat(x.shape[0], 1)
@@ -71,9 +71,9 @@ class BasicBlock(nn.Module):
         residual = self.bn1(residual)
         residual = self.relu1(residual)
         if not adapt:
-            l2_norm = torch.linalg.vector_norm(self.adaptive_weights_conv1)
+            # l2_norm = torch.linalg.vector_norm(self.adaptive_weights_conv1)
             adaptive_weights = self.adaptive_weights_conv1.repeat(batch_size, 1)
-            adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
+            # adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
             residual = self.conv1(residual, adaptive_weights)
         else:
             adaptive_weights = self.adaptive_weights_conv1.repeat(batch_size, 1)
@@ -82,9 +82,9 @@ class BasicBlock(nn.Module):
         residual = self.bn2(residual)
         residual = self.relu2(residual)
         if not adapt:
-            l2_norm = torch.linalg.vector_norm(self.adaptive_weights_conv2)
+            # l2_norm = torch.linalg.vector_norm(self.adaptive_weights_conv2)
             adaptive_weights = self.adaptive_weights_conv2.repeat(batch_size, 1)
-            adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
+            # adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
             residual = self.conv2(residual, adaptive_weights)
         else:
             adaptive_weights = self.adaptive_weights_conv2.repeat(batch_size, 1)

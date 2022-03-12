@@ -3,7 +3,7 @@ import argparse
 
 import torch
 from utils.misc import *
-from utils.test_helpers import *
+from utils.test_helpers_TTT import *
 from utils.prepare_dataset import *
 
 parser = argparse.ArgumentParser()
@@ -29,7 +29,7 @@ args = parser.parse_args()
 my_makedir(args.outf)
 import torch.backends.cudnn as cudnn
 cudnn.benchmark = True
-net, ext, head, ssh = build_model(args)
+net, ext, head, ssh = build_model_modules(args)
 teset, teloader = prepare_test_data(args)
 
 print('Resuming from %s...' %(args.resume))
