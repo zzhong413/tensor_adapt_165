@@ -8,14 +8,18 @@ plt.switch_backend('agg')
 import seaborn as sns
 sns.set_palette('colorblind')
 
-levels = [5, 4, 3, 2, 1]
-common_corruptions = ['gaussian_noise', 'shot_noise', 'impulse_noise', 'defocus_blur', 'glass_blur',
-                    'motion_blur', 'zoom_blur', 'snow', 'frost', 'fog',
-                    'brightness', 'contrast', 'elastic_transform', 'pixelate', 'jpeg_compression']
+# levels = [5, 4, 3, 2, 1]
+# common_corruptions = ['gaussian_noise', 'shot_noise', 'impulse_noise', 'defocus_blur', 'glass_blur',
+#                     'motion_blur', 'zoom_blur', 'snow', 'frost', 'fog',
+#                     'brightness', 'contrast', 'elastic_transform', 'pixelate', 'jpeg_compression']
+
+levels = [5]
+common_corruptions = ['gaussian_noise']
 
 folders = []
-folders.append('results/C10C_layer2_slow_gn_expand_final')
-folders.append('results/C10C_layer2_online_gn_expand_final')
+# folders.append('results/C10C_layer2_slow_gn_expand_final')
+# folders.append('results/C10C_layer2_online_gn_expand_final')
+folders.append('results/C10C_tensor_layer2_slow_gn_expand')
 
 for folder in folders:
 	plt.figure(figsize=(4, 3))

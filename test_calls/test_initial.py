@@ -18,7 +18,7 @@ parser.add_argument('--depth', default=26, type=int)
 parser.add_argument('--width', default=1, type=int)
 parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--group_norm', default=0, type=int)
-parser.add_argument('--grad_corr', action='store_true')
+parser.add_argument('--grad_corr', default=True)
 parser.add_argument('--visualize_samples', action='store_true')
 ########################################################################
 parser.add_argument('--outf', default='.')
