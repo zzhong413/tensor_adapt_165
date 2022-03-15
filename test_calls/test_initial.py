@@ -18,7 +18,7 @@ parser.add_argument('--depth', default=26, type=int)
 parser.add_argument('--width', default=1, type=int)
 parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--group_norm', default=0, type=int)
-parser.add_argument('--grad_corr', default='store_true')
+parser.add_argument('--grad_corr', action='store_true')
 parser.add_argument('--visualize_samples', action='store_true')
 ########################################################################
 parser.add_argument('--outf', default='.')
@@ -60,7 +60,7 @@ rdict = {'cls_initial': cls_initial, 'cls_correct': cls_correct, 'cls_losses': c
 			'ssh_initial': ssh_initial, 'ssh_correct': ssh_correct, 'ssh_losses': ssh_losses}
 torch.save(rdict, args.outf + '/%s_%d_inl.pth' %(args.corruption, args.level))
 
-if args.grad_corr:
-	corr = test_grad_corr(teloader, net, ssh, ext)
-	print('Average gradient inner product: %.2f' %(mean(corr)))
-	torch.save(corr, args.outf + '/%s_%d_grc.pth' %(args.corruption, args.level))
+# if args.grad_corr:
+corr = test_grad_corr(teloader, net, ssh, ext)
+print('Average gradient inner product: %.2f' %(mean(corr)))
+torch.save(corr, args.outf + '/%s_%d_grc.pth' %(args.corruption, args.level))
