@@ -52,7 +52,7 @@ net.load_state_dict(ckpt['net'], strict=False)
 head.load_state_dict(ckpt['head'], strict=False)
 print('resume training from checkpoint ' + str(checkpoint_dir))
 
-# create (500k x rank) tensors, store on cpu
+# create (50k x rank) tensors, store on cpu
 u_train_net = []
 u_test_net = []
 u_train_head = []
