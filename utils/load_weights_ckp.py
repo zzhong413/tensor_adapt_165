@@ -11,3 +11,19 @@ def load_ckp(checkpoint_fpath, net, ssh, optimizer):
     ssh.load_state_dict(checkpoint['state_dict_ssh'], strict=False)
     optimizer.load_state_dict(checkpoint['optimizer'], strict=False)
     return net, ssh, optimizer, checkpoint['epoch']
+
+
+def load_trainable_weights(model, data_to_load):
+    ii = 0
+    for param_name, param in model.named_parameters():
+        if 'trainable' in param_name:
+            param.data = data_to_load[ii]
+            ii += 1
+
+
+def save_trainable_weights(model):
+    data_to_save = []
+    for param_name, param in model.named_parameters():
+        if 'trainable' in param_name:
+            data_to_save.append(param.data)
+    return data_to_save

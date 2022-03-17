@@ -24,7 +24,7 @@ class AdaptConv(nn.Module):
         conv_layer = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding, bias=bias)
         conv_layer.weight.data = ttt_layer
         self.conv1 = SelfAdaptiveConv.from_conv(conv_layer, rank=1.1)
-        self.adaptive_weights_preconv_trainable = nn.Parameter(torch.ones(1, self.conv1.rank))
+        self.adaptive_weights_preconv_trainable = nn.Parameter(torch.ones(128, self.conv1.rank))
         self.adaptive_weights_preconv = torch.ones(1, self.conv1.rank, device='cuda')
 
     def forward(self, x, adapt=False):
@@ -52,7 +52,7 @@ class BasicBlock(nn.Module):
         conv_layer1 = conv3x3(inplanes, planes, stride)
         conv_layer1.weight.data = ttt_net[j+str(i)+'.conv1.weight']
         self.conv1 = SelfAdaptiveConv.from_conv(conv_layer1, rank=1.1)
-        self.adaptive_weights_conv1_trainable = nn.Parameter(torch.ones(1, self.conv1.rank))
+        self.adaptive_weights_conv1_trainable = nn.Parameter(torch.ones(128, self.conv1.rank))
         self.adaptive_weights_conv1 = torch.ones(1, self.conv1.rank, device='cuda')
 
         self.bn2 = norm_layer(planes)
@@ -62,7 +62,7 @@ class BasicBlock(nn.Module):
         conv_layer2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
         conv_layer2.weight.data = ttt_net[j+str(i)+'.conv2.weight']
         self.conv2 = SelfAdaptiveConv.from_conv(conv_layer2, rank=1.1)
-        self.adaptive_weights_conv2_trainable = nn.Parameter(torch.ones(1, self.conv2.rank))
+        self.adaptive_weights_conv2_trainable = nn.Parameter(torch.ones(128, self.conv2.rank))
         self.adaptive_weights_conv2 = torch.ones(1, self.conv2.rank, device='cuda')
 
     def forward(self, x, adapt=False):

@@ -9,7 +9,7 @@ from utils.misc import *
 from utils.test_helpers_TTT import *
 from utils.prepare_dataset import *
 from utils.rotation import rotate_batch
-from utils.save_model import save_ckp, load_ckp
+from utils.load_weights_ckp import save_ckp, load_ckp
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='cifar10')

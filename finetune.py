@@ -9,7 +9,7 @@ from utils.misc import *
 from utils.test_helpers_TTT import *
 from utils.prepare_dataset import *
 from utils.rotation import rotate_batch
-from utils.save_model import save_ckp, load_ckp
+from utils.load_weights_ckp import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='cifar10')
@@ -22,7 +22,7 @@ parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--group_norm', default=0, type=int)
 parser.add_argument('--tensor', action='store_true')
 ########################################################################
-parser.add_argument('--lr', default=0.00001, type=float)
+parser.add_argument('--lr', default=0.0001, type=float)
 parser.add_argument('--nepoch', default=75, type=int)
 parser.add_argument('--milestone_1', default=50, type=int)
 parser.add_argument('--milestone_2', default=65, type=int)
@@ -52,6 +52,22 @@ net.load_state_dict(ckpt['net'], strict=False)
 head.load_state_dict(ckpt['head'], strict=False)
 print('resume training from checkpoint ' + str(checkpoint_dir))
 
+# create (500k x rank) tensors, store on cpu
+u_train_net = []
+u_test_net = []
+u_train_head = []
+u_test_head = []
+
+for param_name, param in net.named_parameters():
+    if 'weight.weights' in param_name:
+        u_train_net.append(torch.ones((len(trloader.dataset), len(param)), pin_memory=True))
+        u_test_net.append(torch.ones((len(teloader.dataset), len(param)), pin_memory=True))
+
+for param_name, param in head.named_parameters():
+    if 'weight.weights' in param_name:
+        u_train_head.append(torch.ones((len(trloader.dataset), len(param)), pin_memory=True))
+        u_test_head.append(torch.ones((len(teloader.dataset), len(param)), pin_memory=True))
+
 parameters = list(net.parameters()) + list(head.parameters())
 optimizer = optim.SGD(parameters, lr=args.lr, momentum=0.9, weight_decay=5e-4)
 scheduler = torch.optim.lr_scheduler.MultiStepLR(
@@ -76,24 +92,38 @@ for epoch in range(1, args.nepoch + 1):
     net.train()
     ssh.train()
 
-    for batch_idx, (inputs, labels) in enumerate(trloader):
+    for batch_idx, (inputs, labels, data_idx) in enumerate(trloader):
         optimizer.zero_grad()
         inputs_cls, labels_cls = inputs.cuda(), labels.cuda()
-        outputs_cls = net(inputs_cls)
+
+        u_train_net_data = [u_train_net[ll][data_idx, :].cuda() for ll in range(len(u_train_net))]
+        u_train_head_data = [u_train_head[ll][data_idx, :].cuda() for ll in range(len(u_train_head))]
+        load_trainable_weights(net, u_train_net_data)
+        load_trainable_weights(head, u_train_head_data)
+
+        outputs_cls = net(inputs_cls, adapt=True)
         loss = criterion(outputs_cls, labels_cls)
 
         if args.shared is not None:
             inputs_ssh, labels_ssh = rotate_batch(inputs, args.rotation_type)
             inputs_ssh, labels_ssh = inputs_ssh.cuda(), labels_ssh.cuda()
-            outputs_ssh = ssh(inputs_ssh)
+            outputs_ssh = ssh(inputs_ssh, adapt=True)
             loss_ssh = criterion(outputs_ssh, labels_ssh)
             loss += loss_ssh
 
         loss.backward()
         optimizer.step()
 
-    err_cls = test(teloader, net)[0]
-    err_ssh = 0 if args.shared is None else test(teloader, ssh, sslabel='expand')[0]
+        u_train_net_data = save_trainable_weights(net)
+        u_train_head_data = save_trainable_weights(head)
+
+        for ll in range(len(u_train_net_data)):
+            u_train_net[ll][data_idx, :] = u_train_net_data[ll].clone().detach().cpu()
+        for ll in range(len(u_train_head_data)):
+            u_train_head[ll][data_idx, :] = u_train_head_data[ll].clone().detach().cpu()
+
+    err_cls = test(teloader, net, adapt=True)[0]
+    err_ssh = 0 if args.shared is None else test(teloader, ssh, sslabel='expand', adapt=True)[0]
     all_err_cls.append(err_cls)
     all_err_ssh.append(err_ssh)
     all_loss.append(loss)

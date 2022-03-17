@@ -53,7 +53,7 @@ def build_model_modules(args):
     return net, ext, head, ssh
 
 
-def test(dataloader, model, sslabel=None):
+def test(dataloader, model, sslabel=None, adapt=False):
     criterion = nn.CrossEntropyLoss(reduction='none').cuda()
     model.eval()
     correct = []
@@ -63,7 +63,7 @@ def test(dataloader, model, sslabel=None):
             inputs, labels = rotate_batch(inputs, sslabel)
         inputs, labels = inputs.cuda(), labels.cuda()
         with torch.no_grad():
-            outputs = model(inputs)
+            outputs = model(inputs, adapt)
             loss = criterion(outputs, labels)
             losses.append(loss.cpu())
             _, predicted = outputs.max(1)
