@@ -30,6 +30,6 @@ def save_trainable_weights(model):
 
 
 def reset_model(ckpt, model_name):
-    for k in ckpt['model_name'].keys():
+    for k in ckpt[model_name].keys():
         if 'trainable' in k:
-            ckpt['model_name'][k] = torch.ones(1, ckpt['model_name'][k].shape[1])
+            ckpt[model_name][k] = torch.ones(1, ckpt[model_name][k].shape[1])
