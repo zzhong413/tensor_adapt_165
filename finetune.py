@@ -123,7 +123,7 @@ for epoch in range(1, args.nepoch + 1):
             u_train_head[ll][data_idx, :] = u_train_head_data[ll].clone().detach().cpu()
 
     err_cls = test(teloader, net, adapt=True)[0]
-    err_ssh = 0 if args.shared is None else test(teloader, ssh, sslabel='expand', adapt=True)[0]
+    err_ssh = 0 if args.shared is None else test(teloader, ssh, sslabel='rand', adapt=True)[0]
     all_err_cls.append(err_cls)
     all_err_ssh.append(err_ssh)
     all_loss.append(loss)
