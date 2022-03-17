@@ -34,8 +34,10 @@ class AdaptConv(nn.Module):
             adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
             x = self.conv1(x, adaptive_weights)
         else:
-            # adaptive_weights = self.adaptive_weights_preconv_trainable.repeat(x.shape[0], 1)
-            adaptive_weights = self.adaptive_weights_preconv_trainable
+            if self.adaptive_weights_preconv_trainable.shape[0]<x.shape[0]:
+                adaptive_weights = self.adaptive_weights_preconv_trainable.repeat(x.shape[0], 1)
+            else:
+                adaptive_weights = self.adaptive_weights_preconv_trainable
             x = self.conv1(x, adaptive_weights)
         return x
 
@@ -77,8 +79,10 @@ class BasicBlock(nn.Module):
             adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
             residual = self.conv1(residual, adaptive_weights)
         else:
-            # adaptive_weights = self.adaptive_weights_conv1_trainable.repeat(batch_size, 1)
-            adaptive_weights = self.adaptive_weights_conv1_trainable
+            if self.adaptive_weights_conv1_trainable.shape[0] < x.shape[0]:
+                adaptive_weights = self.adaptive_weights_conv1_trainable.repeat(batch_size, 1)
+            else:
+                adaptive_weights = self.adaptive_weights_conv1_trainable
             residual = self.conv1(residual, adaptive_weights)
 
         residual = self.bn2(residual)
@@ -89,8 +93,10 @@ class BasicBlock(nn.Module):
             adaptive_weights += torch.randn_like(adaptive_weights) * l2_norm * 0.0001
             residual = self.conv2(residual, adaptive_weights)
         else:
-            # adaptive_weights = self.adaptive_weights_conv2_trainable.repeat(batch_size, 1)
-            adaptive_weights = self.adaptive_weights_conv2_trainable
+            if self.adaptive_weights_conv2_trainable.shape[0] < x.shape[0]:
+                adaptive_weights = self.adaptive_weights_conv2_trainable.repeat(batch_size, 1)
+            else:
+                adaptive_weights = self.adaptive_weights_conv2_trainable
             residual = self.conv2(residual, adaptive_weights)
 
         if self.downsample is not None:
