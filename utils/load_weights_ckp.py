@@ -27,3 +27,9 @@ def save_trainable_weights(model):
         if 'trainable' in param_name:
             data_to_save.append(param.data)
     return data_to_save
+
+
+def reset_model(ckpt, model_name):
+    for k in ckpt['model_name'].keys():
+        if 'trainable' in k:
+            ckpt['model_name'][k] = torch.ones(1, ckpt['model_name'][k].shape[1])

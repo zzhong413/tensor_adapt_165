@@ -5,6 +5,7 @@ import torch
 from utils.misc import *
 from utils.test_helpers_TTT import *
 from utils.prepare_dataset import *
+from utils.load_weights_ckp import reset_model
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='cifar10')
@@ -34,6 +35,8 @@ teset, teloader = prepare_test_data(args)
 
 print('Resuming from %s...' %(args.resume))
 ckpt = torch.load(args.resume + '/ckpt.pth')
+reset_model(ckpt, 'net')
+reset_model(ckpt, 'head')
 net.load_state_dict(ckpt['net'], strict=False)
 cls_initial, cls_correct, cls_losses = test(teloader, net)
 
