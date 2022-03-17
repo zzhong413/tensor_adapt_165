@@ -58,7 +58,7 @@ def test(dataloader, model, sslabel=None, adapt=False):
     model.eval()
     correct = []
     losses = []
-    for batch_idx, (inputs, labels) in enumerate(dataloader):
+    for batch_idx, (inputs, labels, data_idx) in enumerate(dataloader):
         if sslabel is not None:
             inputs, labels = rotate_batch(inputs, sslabel)
         inputs, labels = inputs.cuda(), labels.cuda()
