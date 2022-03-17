@@ -60,7 +60,7 @@ def prepare_test_data(args):
     if not hasattr(args, 'workers'):
         args.workers = 1
     teloader = torch.utils.data.DataLoader(dataset=MyDataset(teset), batch_size=args.batch_size,
-                                           shuffle=False, num_workers=args.workers)
+                                           shuffle=False, num_workers=args.workers, drop_last=True)
     return teset, teloader
 
 
@@ -75,5 +75,5 @@ def prepare_train_data(args):
     if not hasattr(args, 'workers'):
         args.workers = 1
     trloader = torch.utils.data.DataLoader(dataset=MyDataset(trset), batch_size=args.batch_size,
-                                           shuffle=True, num_workers=args.workers)
+                                           shuffle=True, num_workers=args.workers, drop_last=True)
     return trset, trloader
