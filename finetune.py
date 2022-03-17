@@ -46,7 +46,7 @@ _, teloader = prepare_test_data(args)
 _, trloader = prepare_train_data(args)
 
 # load from checkpoint to resume training
-checkpoint_dir = 'results/cifar10_tensor_layer2_gn_expand_1.1/ckpt.pth'
+checkpoint_dir = 'results/cifar10_tensor_layer2_gn_expand/ckpt.pth'
 ckpt = torch.load(checkpoint_dir)
 net.load_state_dict(ckpt['net'], strict=False)
 head.load_state_dict(ckpt['head'], strict=False)
